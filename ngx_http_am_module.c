@@ -639,7 +639,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
     // only then can we proceed to actually escaping it
     for (j = 0; j < r->unparsed_uri.len; j++) {
         if (r->unparsed_uri.data[j] == ':') {
-            escapes += j;
+            escapes++;
         }
     }
 
