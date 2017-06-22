@@ -595,6 +595,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
     size_t len = 4; // "://" + '\0'
     int is_ssl = 0;
     uint32_t i;
+    int32_t j;
     uint32_t escapes = 0;
     int path_len;
 
@@ -636,7 +637,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
 
     // First we need to find out the length of the escaped string and
     // only then can we proceed to actually escaping it
-    for (i = 0; i < r->unparsed_uri.len; j++) {
+    for (i = 0; i < r->unparsed_uri.len; i++) {
         if (r->unparsed_uri.data[i] == ':') {
             escapes++;
         }
@@ -662,9 +663,9 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
      * trailing slashs.
      * see https://bugster.forgerock.org/jira/browse/OPENAM-2969
      */
-    for(i = path_len - 1; i >= 0; i--){
-        if(path[i] == '/'){
-            path[i] = '\0';
+    for(j = path_len - 1; j >= 0; j--){
+        if(path[j] == '/'){
+            path[j] = '\0';
             // Make sure to decrease the length of the string
             // everytime we cut off trailing slashes
             path_len--;
