@@ -628,11 +628,11 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
     }
 
     // Code below escapes the URI before sending it off to the OpenAM
-    // agent. This has the potential effect of fixing the way said
-    // agent handles colon (":") characters present in any place in
-    // URI. Alternative approaches are either to completely remove
-    // colons or remove URL query paramaters (identified by r->args,
-    // r->args_start and r->uri_start).
+    // agent. This has the effect of fixing the way said agent handles
+    // colon (":") characters present in any place in URI. Alternative
+    // approaches are either to completely remove colons or remove URL
+    // query parameters (identified by r->args, r->args_start and
+    // r->uri_start).
 
     // First we need to find out the length of the escaped string and
     // only then can we proceed to actually escaping it
