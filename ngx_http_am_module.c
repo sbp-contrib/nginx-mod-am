@@ -648,7 +648,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
      * trailing slashs.
      * see https://bugster.forgerock.org/jira/browse/OPENAM-2969
      */
-    for(i = path_len; i >= 0; i--){
+    for(i = path_len - 1; i >= 0; i--){
         if(path[i] == '/'){
             path[i] = '\0';
         }else{
