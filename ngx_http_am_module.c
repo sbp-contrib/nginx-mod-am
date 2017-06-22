@@ -649,7 +649,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
         return NULL;
     }
 
-    for (i = 0; i < path_len; i++) {
+    for (i = 0; i < r->unparsed_uri.len; i++) {
         if (r->unparsed_uri.data[i] == ':') {
             *path++ = '%';
             *path++ = '3';
