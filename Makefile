@@ -1,6 +1,7 @@
+.PHONY: build
 
 NGINX_URI=http://nginx.org/download/
-NGINX_VER=1.9.12
+NGINX_VER=1.10.1
 NGINX_SRC=nginx-$(NGINX_VER).tar.gz
 
 DISTDIR=./nginx_agent
@@ -48,4 +49,3 @@ clean:
 
 distclean:
 	rm -rf build/
-
