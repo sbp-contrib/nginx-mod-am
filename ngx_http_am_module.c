@@ -654,7 +654,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
             *path++ = '3';
             *path++ = 'A';
         } else {
-            *path++ = r->unparsed_uri[i];
+            *path++ = r->unparsed_uri.data[i];
         }
     }
 
