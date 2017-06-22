@@ -595,6 +595,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
     size_t len = 4; // "://" + '\0'
     int is_ssl = 0;
     int i;
+    uint32_t j;
     uint32_t escapes;
     int path_len;
 
@@ -636,9 +637,9 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
 
     // First we need to find out the length of the escaped string and
     // only then can we proceed to actually escaping it
-    for (i = 0; i < r->unparsed_uri.len; i++) {
-        if (r->unparsed_uri.data[i] == ':') {
-            escapes += 1;
+    for (j = 0; j < r->unparsed_uri.len; j++) {
+        if (r->unparsed_uri.data[j] == ':') {
+            escapes += j;
         }
     }
 
