@@ -595,7 +595,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
     size_t len = 4; // "://" + '\0'
     int is_ssl = 0;
     int i;
-    uintptr_t escapes;
+    uint32_t escapes;
     int path_len;
 
 #if (NGX_HTTP_SSL)
@@ -636,13 +636,27 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
 
     // First we need to find out the length of the escaped string and
     // only then can we proceed to actually escaping it
-    escapes = ngx_escape_uri(NULL, r->unparsed_uri.data, r->unparsed_uri.len, NGX_ESCAPE_URI);
+    for (i = 0; i < r->unparsed_uri.len; i++) {
+        if (r->unparsed_uri.data[i] == ':') {
+            escapes += 1;
+        }
+    }
+
     path_len = r->unparsed_uri.len + escapes * 2;
     path = ngx_pnalloc(r->pool, path_len);
     if (path == NULL) {
         return NULL;
     }
-    (void) ngx_escape_uri(path, r->unparsed_uri.data, r->unparsed_uri.len, NGX_ESCAPE_URI);
+
+    for (i = 0; i < path_len; i++) {
+        if (r->unparsed_uri.data[i] == ':') {
+            *path++ = '%';
+            *path++ = '3';
+            *path++ = 'A';
+        } else {
+            *path++ = r->unparsed_uri[i];
+        }
+    }
 
     /*
      * trailing slashs.
@@ -651,7 +665,10 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
     for(i = path_len - 1; i >= 0; i--){
         if(path[i] == '/'){
             path[i] = '\0';
-        }else{
+            // Make sure to decrease the length of the string
+            // everytime we cut off trailing slashes
+            path_len--;
+        } else {
             break;
         }
     }
