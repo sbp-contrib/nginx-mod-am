@@ -596,7 +596,7 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
     int is_ssl = 0;
     int i;
     uint32_t j;
-    uint32_t escapes;
+    uint32_t escapes = 0;
     int path_len;
 
 #if (NGX_HTTP_SSL)
