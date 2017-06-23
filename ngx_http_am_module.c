@@ -626,11 +626,11 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
         len += ngx_cycle->hostname.len;
     }
 
-    // Code below trims the part of URL right of "?" character if such
-    // a character is present. This is a workaround for the way OpenAM
-    // agent . Alternative approaches are either to completely remove
-    // colons or remove URL query parameters (identified by r->args,
-    // r->args_start and r->uri_start).
+    // Code below trims the part of URL right of question mark
+    // character ("?") if such a character is present. This is a
+    // workaround for the way OpenAM agent handles colon character
+    // (":") present in URLs. Alternative and perhaps a more correct
+    // approach would be to percent-encode colons.
 
     path = ngx_pstrdup_nul(r->pool, &r->unparsed_uri);
     if (path == NULL) {
