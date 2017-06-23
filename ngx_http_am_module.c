@@ -627,7 +627,8 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
     }
 
     // Code below trims the part of URL right of "?" character if such
-    // a character is present. This is a workaround for the way OpenAM agent . Alternative approaches are either to completely remove
+    // a character is present. This is a workaround for the way OpenAM
+    // agent . Alternative approaches are either to completely remove
     // colons or remove URL query parameters (identified by r->args,
     // r->args_start and r->uri_start).
 
