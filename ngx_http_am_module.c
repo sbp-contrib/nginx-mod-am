@@ -590,14 +590,12 @@ static char* ngx_http_am_get_cookie(ngx_http_request_t *r){
 static char* ngx_http_am_get_url(ngx_http_request_t *r){
     char *proto = NULL;
     char *host = NULL;
-    u_char *path = NULL;
+    char *path = NULL;
     char *url = NULL;
+    char *qmark = NULL;
     size_t len = 4; // "://" + '\0'
     int is_ssl = 0;
-    uint32_t i;
-    int32_t j;
-    uint32_t escapes = 0;
-    int path_len;
+    int32_t i;
 
 #if (NGX_HTTP_SSL)
     /* detect SSL connection */
@@ -628,61 +626,40 @@ static char* ngx_http_am_get_url(ngx_http_request_t *r){
         len += ngx_cycle->hostname.len;
     }
 
-    // Code below escapes the URI before sending it off to the OpenAM
-    // agent. This has the effect of fixing the way said agent handles
-    // colon (":") characters present in any place in URI. Alternative
-    // approaches are either to completely remove colons or remove URL
-    // query parameters (identified by r->args, r->args_start and
-    // r->uri_start).
+    // Code below trims the part of URL right of "?" character if such
+    // a character is present. This is a workaround for the way OpenAM agent . Alternative approaches are either to completely remove
+    // colons or remove URL query parameters (identified by r->args,
+    // r->args_start and r->uri_start).
 
-    // First we need to find out the length of the escaped string and
-    // only then can we proceed to actually escaping it
-    for (i = 0; i < r->unparsed_uri.len; i++) {
-        if (r->unparsed_uri.data[i] == ':') {
-            escapes++;
-        }
-    }
-
-    path_len = r->unparsed_uri.len + escapes * 2;
-    path = ngx_pnalloc(r->pool, path_len);
+    path = ngx_pstrdup_nul(r->pool, &r->unparsed_uri);
     if (path == NULL) {
         return NULL;
     }
 
-    for (i = 0; i < r->unparsed_uri.len; i++) {
-        if (r->unparsed_uri.data[i] == ':') {
-            *path++ = '%';
-            *path++ = '3';
-            *path++ = 'A';
-        } else {
-            *path++ = r->unparsed_uri.data[i];
-        }
+    // Terminate path at first "?" symbol if found
+    qmark = strchr(path, '?');
+    if (qmark != NULL) {
+        *qmark = '\0';
     }
 
-    /*
-     * trailing slashs.
-     * see https://bugster.forgerock.org/jira/browse/OPENAM-2969
-     */
-    for(j = path_len - 1; j >= 0; j--){
-        if(path[j] == '/'){
-            path[j] = '\0';
-            // Make sure to decrease the length of the string
-            // everytime we cut off trailing slashes
-            path_len--;
+    // Remove trailing slashes from path
+    for(i = ngx_strlen(path) - 1; i >= 0; i--){
+        if (path[i] == '/') {
+            path[i] = '\0';
         } else {
             break;
         }
     }
-    len += path_len;
+
+    // We are guaranteed to have a proper null-terminated string at
+    // this point, thus simply adding strlen()'ed should do the trick.
+    len += ngx_strlen(path);
 
     url = ngx_pnalloc(r->pool, len);
     if(!url){
         return NULL;
     }
-    /*
-     * construct url PROTO://HOST:PORT/PATH
-     * No need to append default port(80 or 443), may be...
-     */
+
     snprintf(url, len, "%s://%s%s", proto, host, path);
     return url;
 }
